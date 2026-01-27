@@ -1,0 +1,88 @@
+[
+  {
+    "id": "Intercessor_Squad",
+    "name": "Intercessor Squad",
+    "faction": "Adeptus Astartes",
+    "keywords": ["Infantry", "Battleline", "Grenades", "Imperium", "Tacticus"],
+    "factionKeywords": ["Adeptus Astartes"],
+    "points": 85,
+    "M": "6\"",
+    "T": 4,
+    "SV": "3+",
+    "W": 2,
+    "LD": "6+",
+    "OC": 2,
+    "inv": 0,
+    "weapons": [
+      "WEAPON_BOLT_RIFLE", 
+      "WEAPON_CCW"
+    ],
+    "abilities": [
+      "CORE_LEADER",
+      "ARMY_OATH",
+      "UNIT_OBJECTIVE_SECURED"
+    ],
+    "wargearAbilities": [],
+    "primarchAbilities": [],
+    "unitComposition": "1 Intercessor Sergeant\n4-9 Intercessors\nEvery model is equipped with: bolt rifle; bolt pistol; close combat weapon.",
+    "wargearOptions": "The Intercessor Sergeant's bolt rifle can be replaced with one of the following:\n- 1 hand flamer\n- 1 plasma pistol\n- 1 power sword",
+    "leaderInfo": "This unit can be led by:\n- Captain\n- Lieutenant\n- Librarian\n- Chaplain"
+  },
+  {
+    "id": "Trazyn_the_Infinite",
+    "name": "Trazyn the Infinite",
+    "faction": "Necrons",
+    "keywords": ["Infantry", "Epic Hero", "Xenos"],
+    "factionKeywords": ["Necrons"],
+    "points": 85,
+    "M": "6\"",
+    "T": 4,
+    "SV": "3+",
+    "W": 2,
+    "LD": "6+",
+    "OC": 2,
+    "inv": 0,
+    "weapons": [
+      "WEAPON_BOLT_RIFLE", 
+      "WEAPON_CCW"
+    ],
+    "abilities": [
+      "CORE_LEADER",
+      "ARMY_OATH",
+      "UNIT_OBJECTIVE_SECURED"
+    ],
+    "wargearAbilities": [],
+    "primarchAbilities": []
+  },
+  {
+    "id": "Roboute_Guilliman",
+    "name": "Roboute Guilliman",
+    "faction": "Adeptus Astartes",
+    "keywords": ["Monster", "Character", "Epic Hero", "Imperium", "Primarch"],
+    "factionKeywords": ["Adeptus Astartes", "Ultramarines"],
+    "points": 350,
+    "M": "8\"",
+    "T": 9,
+    "SV": "2+",
+    "W": 10,
+    "LD": "5+",
+    "OC": 4,
+    "inv": "4+",
+    "description":"In one of Guilliman's hands blazes the burning Emperor's Sword. The other is clad in the Hand of Dominion, a gauntlet with which Guilliman can tear apart tanks. The Primarch's strategic brilliance is his greatest weapon however, his enemies outmanoeuvred and out-thought before the battle has even begun.",
+    "weapons": [
+      "WEAPON_HAND_OF_DOMINION_RANGED",
+      "WEAPON_EMPERORS_SWORD"
+    ],
+    "abilities": [
+      "CORE_LEADER",
+      "ARMY_OATH",
+      "PRIMARCH_AUTHOR_CODEX"
+    ],
+    "wargearAbilities": [
+        "WARGEAR_ARMOR_FATE"
+    ],
+    "primarchAbilities": [
+        "PRIMARCH_AUTHOR_CODEX"
+    ]
+  }
+]

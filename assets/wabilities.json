@@ -1,0 +1,22 @@
+[
+  {
+    "id": "WABILITY_ASSAULT",
+    "name": "Assault",
+    "effect": "Can shoot even if it Advanced."
+  },
+  {
+    "id": "WABILITY_HEAVY",
+    "name": "Heavy",
+    "effect": "+1 to Hit roll if unit remained stationary."
+  },
+  {
+    "id": "WABILITY_RAPID_FIRE",
+    "name": "Rapid Fire 2",
+    "effect": "Attacks are doubled within half range."
+  },
+  {
+    "id": "WABILITY_DEVASTATING_WOUNDS",
+    "name": "Devastating Wounds",
+    "effect": "Critical Wounds inflict Mortal Wounds."
+  }
+]

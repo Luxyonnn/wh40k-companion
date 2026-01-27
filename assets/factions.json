@@ -1,0 +1,7 @@
+[
+  { "id": "Adeptus Astartes", "color": "#0D407F", "logo": "adeptus_astartes.png" },
+  { "id": "Necrons", "color": "#00C000", "logo": "necrons.png" },
+  { "id": "Aeldari", "color": "#18ABCC", "logo": "aeldari.png" },
+  { "id": "Tyranids", "color": "#800080", "logo": "tyranids.png" },
+  { "id": "T'au Empire", "color": "#D75816", "logo": "tau.png" }
+]

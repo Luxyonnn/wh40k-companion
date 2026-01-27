@@ -1,0 +1,46 @@
+[
+  {
+    "id": "WEAPON_BOLT_RIFLE",
+    "name": "Bolt Rifle",
+    "range": "24\"",
+    "attacks": 2,
+    "bs_ws": "3+",
+    "strength": 4,
+    "ap": -1,
+    "damage": 1,
+    "abilities": ["WABILITY_ASSAULT", "WABILITY_HEAVY"]
+  },
+  {
+    "id": "WEAPON_CCW",
+    "name": "Close Combat Weapon",
+    "range": "Melee",
+    "attacks": 3,
+    "bs_ws": "3+",
+    "strength": 4,
+    "ap": 0,
+    "damage": 1,
+    "abilities": []
+  },
+  {
+    "id": "WEAPON_HAND_OF_DOMINION_RANGED",
+    "name": "Hand of Dominion (Shooting)",
+    "range": "24\"",
+    "attacks": "D3",
+    "bs_ws": "2+",
+    "strength": 6,
+    "ap": -2,
+    "damage": 2,
+    "abilities": ["WABILITY_RAPID_FIRE"]
+  },
+  {
+    "id": "WEAPON_EMPERORS_SWORD",
+    "name": "The Emperor's Sword",
+    "range": "Melee",
+    "attacks": 7,
+    "bs_ws": "2+",
+    "strength": 8,
+    "ap": -3,
+    "damage": 3,
+    "abilities": ["WABILITY_DEVASTATING_WOUNDS"]
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "CORE_LEADER",
+    "name": "Leader",
+    "effect": "This model can be attached to a Bodyguard unit."
+  },
+  {
+    "id": "CORE_DEEP_STRIKE",
+    "name": "Deep Strike",
+    "effect": "Can be set up in Reserves and arrive later."
+  }
+]

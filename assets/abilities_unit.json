@@ -1,0 +1,7 @@
+[
+  {
+    "id": "UNIT_OBJECTIVE_SECURED",
+    "name": "Objective Secured",
+    "effect": "This unit has an OC characteristic of 2 instead of 1."
+  }
+]

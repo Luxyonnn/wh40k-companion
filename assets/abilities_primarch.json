@@ -1,0 +1,20 @@
+[
+  {
+    "id": "PRIMARCH_AUTHOR_CODEX",
+    "name": "Author of the Codex",
+    "options": [
+      {
+        "name": "Master of Battle",
+        "effect": "At the start of your Command phase..."
+      },
+      {
+        "name": "Master of Strategy",
+        "effect": "Select one friendly Adeptus Astartes unit..."
+      },
+      {
+        "name": "Master of Tactics",
+        "effect": "You can use one Stratagem for 0CP."
+      }
+    ]
+  }
+]
