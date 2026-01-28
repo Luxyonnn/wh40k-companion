@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Imports des modèles (Assurez-vous qu'ils sont tous dans lib/models/)
 import 'models/unit.dart';
@@ -8,6 +9,7 @@ import 'models/faction.dart';
 import 'models/wability.dart';
 import 'models/weapon.dart';
 import 'models/primarch_ability.dart'; 
+import 'models/compare.dart';
 
 void main() {
   runApp(const WarhammerApp());
@@ -56,9 +58,15 @@ class _UnitListScreenState extends State<UnitListScreen> {
   String searchQuery = "";
   String? selectedFaction; // Null = Tous
   String? selectedKeyword; // Null = Tous
-
-  // Variable pour ouvrir/fermer les filtres
   bool showFilters = false;
+
+  // -- MODE COMPARATEUR --
+  bool isCompareMode = false;
+  List<Unit> compareSelection = [];
+
+  // -- ÉTATS DES FAVORIS --
+  List<String> favoriteIds = []; // Liste des IDs favoris
+  bool showFavoritesOnly = false; // Filtre "Voir favoris" actif ?
   
   Map<String, FactionData> factionMap = {}; 
 
@@ -71,7 +79,52 @@ class _UnitListScreenState extends State<UnitListScreen> {
   void initState() {
     super.initState();
     _unitsFuture = loadGameData();
+    _loadFavorites(); // <--- On charge les favoris au démarrage
   }
+
+  void _toggleCompareSelection(Unit unit) {
+    setState(() {
+      if (compareSelection.contains(unit)) {
+        compareSelection.remove(unit);
+      } else {
+        if (compareSelection.length < 2) {
+          compareSelection.add(unit);
+        } else {
+          // Si on en a déjà 2, on remplace le premier (le plus vieux) par le nouveau
+          compareSelection.removeAt(0);
+          compareSelection.add(unit);
+        }
+      }
+    });
+  }
+
+  // 1. Charger depuis la mémoire
+    Future<void> _loadFavorites() async {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        favoriteIds = prefs.getStringList('favorite_units') ?? [];
+      });
+    }
+
+  // 2. Ajouter / Retirer un favori
+  Future<void> _toggleFavorite(String unitId) async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    setState(() {
+      if (favoriteIds.contains(unitId)) {
+        favoriteIds.remove(unitId);
+        debugPrint("💔 Retiré des favoris : $unitId"); // Message Console
+      } else {
+        favoriteIds.add(unitId);
+        debugPrint("❤️ Ajouté aux favoris : $unitId"); // Message Console
+      }
+    });
+    
+    // Sauvegarde
+    await prefs.setStringList('favorite_units', favoriteIds);
+    debugPrint("💾 Liste sauvegardée : $favoriteIds");
+  }
+  // ---------------------------
 
   // LOGIQUE DE FILTRAGE COMBINÉE
   List<Unit> getFilteredUnits() {
@@ -86,7 +139,12 @@ class _UnitListScreenState extends State<UnitListScreen> {
       // 3. Filtre Keyword (Boutons du bas)
       final matchesKeyword = selectedKeyword == null || unit.keywords.contains(selectedKeyword);
 
-      return matchesSearch && matchesFaction && matchesKeyword;
+      // 4. FAVORIS (Correction logique)
+      // Si "showFavoritesOnly" est FAUX, on prend tout (true).
+      // Si "showFavoritesOnly" est VRAI, on vérifie si l'ID est dans la liste.
+      final matchesFavorites = !showFavoritesOnly || favoriteIds.contains(unit.id);
+
+      return matchesSearch && matchesFaction && matchesKeyword && matchesFavorites;
     }).toList();
   }
 
@@ -94,6 +152,7 @@ class _UnitListScreenState extends State<UnitListScreen> {
   List<String> getUniqueFactions() {
     return allUnits.map((u) => u.faction).toSet().toList()..sort();
   }
+
 
   Future<List<Unit>> loadGameData() async {
     // ... (Votre code de chargement existant reste IDENTIQUE ici) ...
@@ -155,7 +214,40 @@ class _UnitListScreenState extends State<UnitListScreen> {
       appBar: AppBar(
         title: const Text("BIBLIOTHÈQUE", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         centerTitle: true,
+        actions: [
+          // BOUTON BALANCE POUR ACTIVER LE MODE
+          IconButton(
+            icon: Icon(Icons.balance, color: isCompareMode ? Colors.amber : Colors.grey),
+            tooltip: "Mode Comparaison",
+            onPressed: () {
+              setState(() {
+                isCompareMode = !isCompareMode;
+                compareSelection.clear(); // On vide quand on change de mode
+              });
+            },
+          ),
+          const SizedBox(width: 10),
+        ],
       ),
+
+      // BOUTON FLOTTANT QUI APPARAIT QUAND 2 UNITÉS SONT SÉLECTIONNÉES
+      floatingActionButton: (isCompareMode && compareSelection.length == 2) 
+        ? FloatingActionButton.extended(
+            backgroundColor: Colors.amber,
+            onPressed: () {
+              // Navigation vers le nouveau fichier compare.dart
+              Navigator.push(context, MaterialPageRoute(
+                builder: (c) => UnitComparisonScreen(
+                  unitA: compareSelection[0], 
+                  unitB: compareSelection[1]
+                )
+              ));
+            },
+            label: const Text("COMPARER", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            icon: const Icon(Icons.compare_arrows, color: Colors.black),
+          )
+        : null,
+
       body: FutureBuilder<List<Unit>>(
         future: _unitsFuture,
         builder: (context, snapshot) {
@@ -212,6 +304,27 @@ class _UnitListScreenState extends State<UnitListScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        
+                        // -- SECTION FAVORIS (NOUVEAU) --
+                        const Padding(
+                          padding: EdgeInsets.only(left: 16, top: 10, bottom: 5),
+                          child: Text("FILTRE RAPIDE", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Row(
+                            children: [
+                              // LE BOUTON CŒUR
+                              _filterChip(
+                                "♥  MES FAVORIS", 
+                                showFavoritesOnly, 
+                                () => setState(() => showFavoritesOnly = !showFavoritesOnly),
+                                isFavoriteBtn: true // Style spécial rouge
+                              ),
+                            ],
+                          ),
+                        ),
+                        
                         // Titre discret
                         const Padding(
                           padding: EdgeInsets.only(left: 16, top: 10, bottom: 5),
@@ -282,11 +395,15 @@ class _UnitListScreenState extends State<UnitListScreen> {
     );
   }
 
-  // --- WIDGET POUR LES BOUTONS FILTRES (CHIPS) ---
-  Widget _filterChip(String label, bool isSelected, VoidCallback onTap, {bool isSecondary = false}) {
-    // Couleur active : Rouge pour Faction, Gris Clair pour Keyword
-    final activeColor = isSecondary ? Colors.white24 : const Color(0xFF8B0000);
+  // WIDGET BOUTON FILTRE (Mis à jour pour le bouton Favori)
+  Widget _filterChip(String label, bool isSelected, VoidCallback onTap, {bool isSecondary = false, bool isFavoriteBtn = false}) {
+    // Si c'est le bouton favori : Rouge vif si actif, Rouge sombre si inactif
+    // Sinon : Rouge ou Gris
+    Color activeColor = isSecondary ? Colors.white24 : const Color(0xFF8B0000);
+    if (isFavoriteBtn) activeColor = Colors.redAccent;
+
     final inactiveColor = const Color(0xFF1E1E1E);
+    final borderColor = isSelected ? activeColor : Colors.grey.shade800;
     
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
@@ -298,15 +415,13 @@ class _UnitListScreenState extends State<UnitListScreen> {
           decoration: BoxDecoration(
             color: isSelected ? activeColor : inactiveColor,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isSelected ? activeColor : Colors.grey.shade800,
-            ),
+            border: Border.all(color: borderColor),
           ),
           child: Text(
             label,
             style: TextStyle(
               color: isSelected ? Colors.white : Colors.grey,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              fontWeight: isSelected || isFavoriteBtn ? FontWeight.bold : FontWeight.normal,
               fontSize: 11,
             ),
           ),
@@ -324,16 +439,28 @@ class _UnitListScreenState extends State<UnitListScreen> {
       }
     }
     final Color finalColor = style?.color ?? Colors.grey;
+    final bool isFav = favoriteIds.contains(unit.id);
+    
+    // NOUVEAU : Est-ce sélectionné ?
+    final bool isSelectedCompare = compareSelection.contains(unit);
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => UnitDetailScreen(unit: unit, factionStyle: style)));
+        if (isCompareMode) {
+          _toggleCompareSelection(unit); // Mode Comparaison
+        } else {
+          // Mode Normal : On ouvre la fiche
+          Navigator.push(context, MaterialPageRoute(builder: (context) => UnitDetailScreen(unit: unit, factionStyle: style)));
+        }
       },
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF1E1E1E),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: finalColor.withOpacity(0.5), width: 1.5),
+          // BORDURE : Jaune épais si sélectionné, sinon couleur de faction
+          border: isSelectedCompare 
+              ? Border.all(color: Colors.amber, width: 3) 
+              : Border.all(color: finalColor.withValues(alpha: 0.5), width: 1.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -354,6 +481,21 @@ class _UnitListScreenState extends State<UnitListScreen> {
                       ),
                     ),
                   ),
+                  // On cache le cœur en mode comparaison pour ne pas surcharger
+                  if (!isCompareMode)
+                  Positioned(
+                    top: 0, right: 0,
+                    child: IconButton(
+                      icon: Icon(isFav ? Icons.favorite : Icons.favorite_border, color: isFav ? Colors.redAccent : Colors.white70, shadows: const [Shadow(color: Colors.black, blurRadius: 4)]),
+                      onPressed: () => _toggleFavorite(unit.id),
+                    ),
+                  ),
+                  // Indicateur de sélection (Coche Jaune)
+                  if (isSelectedCompare)
+                  Container(
+                    color: Colors.black45,
+                    child: const Center(child: Icon(Icons.check_circle, color: Colors.amber, size: 40)),
+                  )
                 ],
               ),
             ),
@@ -567,7 +709,7 @@ class UnitDetailScreen extends StatelessWidget {
                     width: double.infinity,
                     margin: const EdgeInsets.only(bottom: 10),
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: const Color(0xFF2A2A2A), borderRadius: BorderRadius.circular(6), border: Border.all(color: primaryColor.withOpacity(0.5))),
+                    decoration: BoxDecoration(color: const Color(0xFF2A2A2A), borderRadius: BorderRadius.circular(6), border: Border.all(color: primaryColor.withValues(alpha:0.5))),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -642,7 +784,7 @@ class UnitDetailScreen extends StatelessWidget {
   Widget _statBox(String label, String value, Color borderColor) {
     return Container(
       width: 60, height: 60,
-      decoration: BoxDecoration(color: const Color(0xFF222222), borderRadius: BorderRadius.circular(8), border: Border.all(color: borderColor.withOpacity(0.7), width: 2)),
+      decoration: BoxDecoration(color: const Color(0xFF222222), borderRadius: BorderRadius.circular(8), border: Border.all(color: borderColor.withValues(alpha:0.7), width: 2)),
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
         Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
