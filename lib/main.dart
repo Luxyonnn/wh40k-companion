@@ -543,8 +543,8 @@ class UnitDetailScreen extends StatelessWidget {
     final coreAbilities = unit.abilities.where((a) => a.id.startsWith("CORE_")).toList();
     final armyAbilities = unit.abilities.where((a) => a.id.startsWith("ARMY_")).toList();
     final specificUnitAbilities = unit.abilities.where((a) => a.id.startsWith("UNIT_")).toList();
-    final rangedWeapons = unit.weapons.where((w) => w.range.toLowerCase() != "melee").toList();
-    final meleeWeapons = unit.weapons.where((w) => w.range.toLowerCase() == "melee").toList();
+    final rangedWeapons = unit.weapons.where((w) => w.range.toLowerCase() != "-").toList();
+    final meleeWeapons = unit.weapons.where((w) => w.range.toLowerCase() == "-").toList();
 
     return Scaffold(
       appBar: AppBar(

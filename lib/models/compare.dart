@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'unit.dart';
 import 'weapon.dart';
-import 'wability.dart';
 
 class UnitComparisonScreen extends StatelessWidget {
   final Unit unitA;
@@ -52,8 +51,8 @@ class _UnitFullColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rangedWeapons = unit.weapons.where((w) => w.range.toLowerCase() != "melee").toList();
-    final meleeWeapons = unit.weapons.where((w) => w.range.toLowerCase() == "melee").toList();
+    final rangedWeapons = unit.weapons.where((w) => w.range.toLowerCase() != "-").toList();
+    final meleeWeapons = unit.weapons.where((w) => w.range.toLowerCase() == "-").toList();
     final specificUnitAbilities = unit.abilities.where((a) => a.id.startsWith("UNIT_")).toList();
 
     return Container(
@@ -67,7 +66,7 @@ class _UnitFullColumn extends StatelessWidget {
           // 1. IMAGE (Plus grande : 150px au lieu de 100px)
           Center(
             child: Container(
-              height: 150, width: 150, 
+              height: 250, width: 250, 
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: color.withValues(alpha: 0.5), width: 3),

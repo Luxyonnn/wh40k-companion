@@ -13,7 +13,7 @@
   {
     "id": "WEAPON_CCW",
     "name": "Close Combat Weapon",
-    "range": "Melee",
+    "range": "-",
     "attacks": 3,
     "bs_ws": "3+",
     "strength": 4,
@@ -35,7 +35,7 @@
   {
     "id": "WEAPON_EMPERORS_SWORD",
     "name": "The Emperor's Sword",
-    "range": "Melee",
+    "range": "-",
     "attacks": 7,
     "bs_ws": "2+",
     "strength": 8,
